@@ -41,7 +41,7 @@ public class CreateOrder extends PayPalClient {
      *@return HttpResponseOrder response received from API
      *@throws IOException Exceptions from API if any
      */
-    public Map<String, String> createOrder(boolean debug) throws IOException {
+    public String createOrder(boolean debug) throws IOException {
         Map<String, String> map = new HashMap<>();
         OrdersCreateRequest request = new OrdersCreateRequest();
         request.prefer("return=representation");
@@ -65,7 +65,7 @@ public class CreateOrder extends PayPalClient {
 
             map.put("statusCode" , response.statusCode()+"");
             map.put("status" , response.result().status());
-            map.put("orderID" , response.result().id());
+            map.put("order_id" , response.result().id());
 
             //return response.result().id();
         } else {
@@ -73,11 +73,12 @@ public class CreateOrder extends PayPalClient {
             map.put("Reponse",response.toString());
             //return response.toString();
         }
-        return map;
+
+        return map.toString();
         //}
     }
 
-    public Map<String, String> createOrder(OriginalOrder originalOrder) throws IOException {
+    public String createOrder(OriginalOrder originalOrder) throws IOException {
         Map<String, String> map = new HashMap<>();
         System.out.println("Create Order: " + originalOrder.getIntent());
         OrdersCreateRequest request = new OrdersCreateRequest();
@@ -102,7 +103,7 @@ public class CreateOrder extends PayPalClient {
 
                 map.put("statusCode" , response.statusCode()+"");
                 map.put("status" , response.result().status());
-                map.put("orderID" , response.result().id());
+                map.put("order_id" , response.result().id());
 
                 //return response.result().id();
             } else {
@@ -110,7 +111,7 @@ public class CreateOrder extends PayPalClient {
                 map.put("Reponse",response.toString());
                 //return response.toString();
             }
-            return map;
+        return map.toString();
         //}
 
     }
@@ -139,21 +140,21 @@ public class CreateOrder extends PayPalClient {
                 .description("Sporting Goods")
                 .customId("CUST-HighFashions")
                 .softDescriptor("HighFashions")
-                .amount(new AmountWithBreakdown().currencyCode(currency).value("2300.00")
-                        .breakdown(new AmountBreakdown().itemTotal(new Money().currencyCode(currency).value("1800.00"))
-                                .shipping(new Money().currencyCode(currency).value("300.00"))
-                                .handling(new Money().currencyCode(currency).value("100.00"))
-                                .taxTotal(new Money().currencyCode(currency).value("200.00"))
-                                .shippingDiscount(new Money().currencyCode(currency).value("100.00"))))
+                .amount(new AmountWithBreakdown().currencyCode(currency).value("500.00")
+                        .breakdown(new AmountBreakdown().itemTotal(new Money().currencyCode(currency).value("500.00"))
+                                .shipping(new Money().currencyCode(currency).value("10.00"))
+                                .handling(new Money().currencyCode(currency).value("0.00"))
+                                .taxTotal(new Money().currencyCode(currency).value("0.00"))
+                                .shippingDiscount(new Money().currencyCode(currency).value("10.00"))))
                 .items(new ArrayList<Item>() {
                     {
                         add(new Item().name("T-shirt").description("Green XL").sku("sku01")
-                                .unitAmount(new Money().currencyCode(currency).value("900.00"))
-                                .tax(new Money().currencyCode(currency).value("100.00")).quantity("1")
+                                .unitAmount(new Money().currencyCode(currency).value("200.00"))
+                                .tax(new Money().currencyCode(currency).value("0.00")).quantity("1")
                                 .category("PHYSICAL_GOODS"));
                         add(new Item().name("Shoes").description("Running, Size 10.5").sku("sku02")
-                                .unitAmount(new Money().currencyCode(currency).value("450.00"))
-                                .tax(new Money().currencyCode(currency).value("50.00")).quantity("2")
+                                .unitAmount(new Money().currencyCode(currency).value("300.00"))
+                                .tax(new Money().currencyCode(currency).value("0.00")).quantity("1")
                                 .category("PHYSICAL_GOODS"));
                     }
                 })
@@ -183,21 +184,21 @@ public class CreateOrder extends PayPalClient {
                 .description("Sporting Goods")
                 .customId("CUST-HighFashions")
                 .softDescriptor("HighFashions")
-                .amount(new AmountWithBreakdown().currencyCode(currency).value("2300.00")
-                        .breakdown(new AmountBreakdown().itemTotal(new Money().currencyCode(currency).value("1800.00"))
-                                .shipping(new Money().currencyCode(currency).value("300.00"))
-                                .handling(new Money().currencyCode(currency).value("100.00"))
-                                .taxTotal(new Money().currencyCode(currency).value("200.00"))
-                                .shippingDiscount(new Money().currencyCode(currency).value("100.00"))))
+                .amount(new AmountWithBreakdown().currencyCode(currency).value("500.00")
+                        .breakdown(new AmountBreakdown().itemTotal(new Money().currencyCode(currency).value("500.00"))
+                                .shipping(new Money().currencyCode(currency).value("10.00"))
+                                .handling(new Money().currencyCode(currency).value("0.00"))
+                                .taxTotal(new Money().currencyCode(currency).value("0.00"))
+                                .shippingDiscount(new Money().currencyCode(currency).value("10.00"))))
                 .items(new ArrayList<Item>() {
                     {
                         add(new Item().name("T-shirt").description("Green XL").sku("sku01")
-                                .unitAmount(new Money().currencyCode(currency).value("900.00"))
-                                .tax(new Money().currencyCode(currency).value("100.00")).quantity("1")
+                                .unitAmount(new Money().currencyCode(currency).value("200.00"))
+                                .tax(new Money().currencyCode(currency).value("0.00")).quantity("1")
                                 .category("PHYSICAL_GOODS"));
                         add(new Item().name("Shoes").description("Running, Size 10.5").sku("sku02")
-                                .unitAmount(new Money().currencyCode(currency).value("450.00"))
-                                .tax(new Money().currencyCode(currency).value("50.00")).quantity("2")
+                                .unitAmount(new Money().currencyCode(currency).value("300.00"))
+                                .tax(new Money().currencyCode(currency).value("0.00")).quantity("1")
                                 .category("PHYSICAL_GOODS"));
                     }
                 })
