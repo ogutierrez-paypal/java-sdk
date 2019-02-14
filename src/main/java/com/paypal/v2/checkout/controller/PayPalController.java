@@ -35,7 +35,8 @@ public class PayPalController {
     }
 
     @GetMapping("/front-create-order")
-    public String createOrder() {
+    @ResponseBody
+    public Map<String, String> createOrder() {
         System.out.println("Entering original order from FRONT: ");
         CreateOrder createOrder = new CreateOrder();
         try {
@@ -48,7 +49,8 @@ public class PayPalController {
 
     //@CrossOrigin(origins = "http://192.168.64.2")
     @PostMapping("/create-order")
-    public String createOrder(@RequestBody OriginalOrder originalOrder) {
+    @ResponseBody
+    public Map<String, String> createOrder(@RequestBody OriginalOrder originalOrder) {
         System.out.println("Entering original order: "+ originalOrder.getIntent());
         CreateOrder createOrder = new CreateOrder();
         try {

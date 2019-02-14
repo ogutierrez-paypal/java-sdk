@@ -41,7 +41,7 @@ public class CreateOrder extends PayPalClient {
      *@return HttpResponseOrder response received from API
      *@throws IOException Exceptions from API if any
      */
-    public String createOrder(boolean debug) throws IOException {
+    public Map<String, String> createOrder(boolean debug) throws IOException {
         Map<String, String> map = new HashMap<>();
         OrdersCreateRequest request = new OrdersCreateRequest();
         request.prefer("return=representation");
@@ -74,11 +74,11 @@ public class CreateOrder extends PayPalClient {
             //return response.toString();
         }
 
-        return map.toString();
+        return map;
         //}
     }
 
-    public String createOrder(OriginalOrder originalOrder) throws IOException {
+    public Map<String, String> createOrder(OriginalOrder originalOrder) throws IOException {
         Map<String, String> map = new HashMap<>();
         System.out.println("Create Order: " + originalOrder.getIntent());
         OrdersCreateRequest request = new OrdersCreateRequest();
@@ -111,7 +111,7 @@ public class CreateOrder extends PayPalClient {
                 map.put("Reponse",response.toString());
                 //return response.toString();
             }
-        return map.toString();
+        return map;
         //}
 
     }
