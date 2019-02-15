@@ -65,7 +65,7 @@ public class CreateOrder extends PayPalClient {
 
             map.put("statusCode" , response.statusCode()+"");
             map.put("status" , response.result().status());
-            map.put("order_id" , response.result().id());
+            map.put("id" , response.result().id());
 
             //return response.result().id();
         } else {
@@ -103,7 +103,7 @@ public class CreateOrder extends PayPalClient {
 
                 map.put("statusCode" , response.statusCode()+"");
                 map.put("status" , response.result().status());
-                map.put("order_id" , response.result().id());
+                map.put("id" , response.result().id());
 
                 //return response.result().id();
             } else {

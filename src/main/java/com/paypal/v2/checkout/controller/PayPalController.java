@@ -61,6 +61,19 @@ public class PayPalController {
         }
     }
 
+    @PostMapping("/capture-order")
+    @ResponseBody
+    public Map<String, String> captureOrder(@RequestBody Map<String, Object> map) {
+        System.out.println("Capature Controller, order value: "+ map.get("orderID"));
+        CaptureOrder captureOrder = new CaptureOrder();
+        try {
+            return captureOrder.captureOrder(map.get("orderID").toString(),true);
+        } catch (IOException e) {
+            e.getMessage();
+            return null;
+        }
+    }
+
     @GetMapping("/get-order")
     public String getOrder() {
         GetOrder getOrder = new GetOrder();

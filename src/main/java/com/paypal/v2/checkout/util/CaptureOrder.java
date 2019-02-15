@@ -3,6 +3,8 @@ package com.paypal.v2.checkout.util;
 
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.braintreepayments.http.HttpResponse;
 import com.paypal.orders.Capture;
@@ -30,13 +32,15 @@ public class CaptureOrder extends PayPalClient {
      *@return HttpResponseCapture response received from API
      *@throws IOException Exceptions from API if any
      */
-    public HttpResponse<Order> captureOrder(String orderId, boolean debug) throws IOException {
+    public Map<String, String> captureOrder(String orderId, boolean debug) throws IOException {
+        System.out.println("Capturing original order: "+ orderId);
+        Map<String, String> map = new HashMap<>();
         OrdersCaptureRequest request = new OrdersCaptureRequest(orderId);
         request.requestBody(buildRequestBody());
         //3. Call PayPal to capture an order
         HttpResponse<Order> response = client().execute(request);
         //4. Save the capture ID to your database. Implement logic to save capture to your database for future reference.
-        if (debug) {
+        //if (debug) {
             System.out.println("Status Code: " + response.statusCode());
             System.out.println("Status: " + response.result().status());
             System.out.println("Order ID: " + response.result().id());
@@ -55,8 +59,13 @@ public class CaptureOrder extends PayPalClient {
             System.out.println("\tEmail Address: " + buyer.emailAddress());
             System.out.println("\tName: " + buyer.name().fullName());
             System.out.println("\tPhone Number: " + buyer.phone().countryCode() + buyer.phone().nationalNumber());
-        }
-        return response;
+
+            map.put("statusCode" , response.statusCode()+"");
+            map.put("status" , response.result().status());
+            map.put("id" , response.result().id());
+            map.put("details" , response.result().id());
+        //}
+        return map;
     }
 
     /**
@@ -77,7 +86,7 @@ public class CaptureOrder extends PayPalClient {
      */
     public static void main(String[] args) {
         try {
-            new CaptureOrder().captureOrder("04S84476VH195072A", true);
+            new CaptureOrder().captureOrder("56S39213E8571624S", true);
         } catch (Exception e) {
             e.printStackTrace();
         }
