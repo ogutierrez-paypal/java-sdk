@@ -51,7 +51,7 @@ public class PayPalController {
     @PostMapping("/create-order")
     @ResponseBody
     public Map<String, String> createOrder(@RequestBody OriginalOrder originalOrder) {
-        System.out.println("Entering original order: "+ originalOrder.getIntent());
+        System.out.println("Entering original order: "+ originalOrder.toString());
         CreateOrder createOrder = new CreateOrder();
         try {
             return createOrder.createOrder(originalOrder);

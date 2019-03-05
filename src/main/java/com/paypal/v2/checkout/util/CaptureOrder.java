@@ -86,7 +86,7 @@ public class CaptureOrder extends PayPalClient {
      */
     public static void main(String[] args) {
         try {
-            new CaptureOrder().captureOrder("56S39213E8571624S", true);
+            new CaptureOrder().captureOrder("3RL42651F8311421K", true);
         } catch (Exception e) {
             e.printStackTrace();
         }

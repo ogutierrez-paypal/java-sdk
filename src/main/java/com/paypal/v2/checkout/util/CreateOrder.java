@@ -24,7 +24,6 @@ import com.paypal.orders.OrdersCreateRequest;
 import com.paypal.orders.PurchaseUnitRequest;
 import com.paypal.orders.ShippingDetails;
 import com.paypal.v2.checkout.controller.OriginalOrder;
-import org.json.JSONObject;
 
 /*
  *
@@ -65,7 +64,7 @@ public class CreateOrder extends PayPalClient {
 
             map.put("statusCode" , response.statusCode()+"");
             map.put("status" , response.result().status());
-            map.put("id" , response.result().id());
+            map.put("orderID" , response.result().id());
 
             //return response.result().id();
         } else {
@@ -85,7 +84,11 @@ public class CreateOrder extends PayPalClient {
         request.prefer("return=representation");
         request.requestBody(buildRequestBody(originalOrder));
         //3. Call PayPal to set up a transaction
-        HttpResponse<Order> response = client().execute(request);
+        try{
+            HttpResponse<Order> response = client().execute(request);
+
+
+
         System.out.println("Response: " + response.toString());
        // if (true) {
             if (response.statusCode() == 201) {
@@ -101,9 +104,15 @@ public class CreateOrder extends PayPalClient {
                         + " " + response.result().purchaseUnits().get(0).amount().value());
 
 
+
+                for (LinkDescription link : response.result().links()) {
+                    map.put(link.rel() +"URL" ,  link.href());
+                }
                 map.put("statusCode" , response.statusCode()+"");
                 map.put("status" , response.result().status());
-                map.put("id" , response.result().id());
+                map.put("order_id" , response.result().id());
+                map.put("totalAmount" , response.result().purchaseUnits().get(0).amount().currencyCode()
+                        + " " + response.result().purchaseUnits().get(0).amount().value());
 
                 //return response.result().id();
             } else {
@@ -111,9 +120,12 @@ public class CreateOrder extends PayPalClient {
                 map.put("Reponse",response.toString());
                 //return response.toString();
             }
-        return map;
-        //}
 
+        } catch(Exception e){
+            System.out.println("Error: " + e.getMessage());
+            map.put("error",e.getMessage());
+        }
+        return map;
     }
 
 
@@ -133,36 +145,55 @@ public class CreateOrder extends PayPalClient {
                 .landingPage(originalOrder.getLandingPage())
                 .shippingPreference(originalOrder.getShippingPreference());
         orderRequest.applicationContext(applicationContext);
-
+        System.out.println("item Category: "+ originalOrder.getItems().get(0).getCategory());
         List<PurchaseUnitRequest> purchaseUnitRequests = new ArrayList<PurchaseUnitRequest>();
         PurchaseUnitRequest purchaseUnitRequest = new PurchaseUnitRequest()
-                .referenceId("PUHF")
-                .description("Sporting Goods")
-                .customId("CUST-HighFashions")
-                .softDescriptor("HighFashions")
-                .amount(new AmountWithBreakdown().currencyCode(currency).value("500.00")
-                        .breakdown(new AmountBreakdown().itemTotal(new Money().currencyCode(currency).value("500.00"))
-                                .shipping(new Money().currencyCode(currency).value("10.00"))
-                                .handling(new Money().currencyCode(currency).value("0.00"))
-                                .taxTotal(new Money().currencyCode(currency).value("0.00"))
-                                .shippingDiscount(new Money().currencyCode(currency).value("10.00"))))
+                .referenceId(originalOrder.getReferenceId())
+                .description(originalOrder.getDescription())
+                .customId(originalOrder.getCustomId())
+                .softDescriptor(originalOrder.getSoftDescriptor())
+                .amount(new AmountWithBreakdown().currencyCode(currency).value(originalOrder.getTotal())
+                        .breakdown(
+                                new AmountBreakdown().itemTotal(new Money().currencyCode(currency).value(originalOrder.getTotal()))
+                                .shipping(new Money().currencyCode(currency).value(originalOrder.getShipping()))
+                                .handling(new Money().currencyCode(currency).value(originalOrder.getHandling()))
+                                .taxTotal(new Money().currencyCode(currency).value(originalOrder.getTaxTotal()))
+                                .shippingDiscount(new Money().currencyCode(currency).value(originalOrder.getShippingDiscount()))))
                 .items(new ArrayList<Item>() {
                     {
-                        add(new Item().name("T-shirt").description("Green XL").sku("sku01")
-                                .unitAmount(new Money().currencyCode(currency).value("200.00"))
-                                .tax(new Money().currencyCode(currency).value("0.00")).quantity("1")
-                                .category("PHYSICAL_GOODS"));
-                        add(new Item().name("Shoes").description("Running, Size 10.5").sku("sku02")
-                                .unitAmount(new Money().currencyCode(currency).value("300.00"))
-                                .tax(new Money().currencyCode(currency).value("0.00")).quantity("1")
-                                .category("PHYSICAL_GOODS"));
+                        add(new Item()
+                                .name(originalOrder.getItems().get(0).getName())
+                                .description(originalOrder.getItems().get(0).getDescription())
+                                .sku(originalOrder.getItems().get(0).getSku())
+                                .unitAmount(new Money().currencyCode(currency).value(originalOrder.getItems().get(0).getUnitAmount()))
+                                .tax(new Money().currencyCode(currency).value(originalOrder.getItems().get(0).getTax()))
+                                .quantity(originalOrder.getItems().get(0).getQuantity())
+                                .category(originalOrder.getItems().get(0).getCategory()));
                     }
                 })
-                .shipping(new ShippingDetails().name(new Name().fullName("Isaac"))
-                        .addressPortable(new AddressPortable().addressLine1("Grecia 151").addressLine2("203")
-                                .adminArea2("CDMX").adminArea1("CDMX").postalCode("02090").countryCode("MX")));
+                .shipping(new ShippingDetails().name(new Name().fullName(originalOrder.getAddress().getName()))
+                        .addressPortable(new AddressPortable()
+                                .addressLine1(originalOrder.getAddress().getAddressLine1())
+                                .addressLine2(originalOrder.getAddress().getAddressLine2())
+                                .adminArea2(originalOrder.getAddress().getAdminArea2())
+                                .adminArea1(originalOrder.getAddress().getAdminArea1())
+                                .postalCode(originalOrder.getAddress().getPostalCode())
+                                .countryCode(originalOrder.getAddress().getCountryCode())));
+        System.out.println("purchaseUnitRequest: \n" +
+                "\ndescription "+ purchaseUnitRequest.description() +
+                "\nreferenceId "+ purchaseUnitRequest.referenceId() +
+                "\nsoftDescriptor "+ purchaseUnitRequest.softDescriptor() +
+                "\namount currencyCode "+ purchaseUnitRequest.amount().currencyCode() +
+                "\namount  value"+ purchaseUnitRequest.amount().value() +
+                "\namount taxTotal "+ purchaseUnitRequest.amount().breakdown().taxTotal().value() +
+                "\namount handling "+ purchaseUnitRequest.amount().breakdown().handling().value() +
+                "\namount shipping "+ purchaseUnitRequest.amount().breakdown().shipping().value() +
+                "\namount shippingDiscount "+ purchaseUnitRequest.amount().breakdown().shippingDiscount().value() +
+                "\namount itemTotal "+ purchaseUnitRequest.amount().breakdown().itemTotal().value()
+        );
         purchaseUnitRequests.add(purchaseUnitRequest);
         orderRequest.purchaseUnits(purchaseUnitRequests);
+        System.out.println("Request: " + orderRequest.toString());
         return orderRequest;
     }
 
